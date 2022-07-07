@@ -1,0 +1,6 @@
+add checkfail
+make help cmd
+make readme
+improve oauth flow, preferably netlifyapp 
+errors :(
+make tutorial
