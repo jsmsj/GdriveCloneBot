@@ -63,24 +63,49 @@ function getAllUrlParams(url) {
     return obj;
   }
 
+  function allpermutations(inputArr) {
+    var results = [];
+  
+    function permute(arr, memo) {
+      var cur, memo = memo || [];
+  
+      for (var i = 0; i < arr.length; i++) {
+        cur = arr.splice(i, 1);
+        if (arr.length === 0) {
+          results.push(memo.concat(cur));
+        }
+        permute(arr.slice(), memo.concat(cur));
+        arr.splice(i, 0, cur[0]);
+      }
+  
+      return results;
+    }
+  
+    return permute(inputArr);
+  }
+
 function get_auth_code(url){
     dict = getAllUrlParams(url)
-    const scope = "https://www.googleapis.com/auth/drive%20https://www.googleapis.com/auth/cloud-platform%20https://www.googleapis.com/auth/iam"
+    const all_perms = JSON.stringify(allpermutations(["https://www.googleapis.com/auth/drive","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/iam"]))
+    scopes__ = JSON.stringify(decodeURIComponent(dict.scope).split("+"))
+    if (all_perms.indexOf(scopes__) === -1){
+      var scope = false
+    }
+    else{
+      var scope = true
+    }
     if (Object.keys(dict).length === 0){
         return "Kindly go back and re-run the authorize command."
     }
-    else if (dict.scope === scope){
-        return dict.code
+    else if (scope){
+        return decodeURIComponent(dict.code)
     }
-    else if (dict.error){
+    else if (decodeURIComponent(dict.error)){
         return "Error Access Denied"
-    }
-    else if (dict.scope !== scope){
-        return "You did not check all the scopes !"
     }
     else{
         console.log(dict)
-        return "Error, Report it to jsmsj#5252 on Discord"
+        return "You did not check all the scopes! OR an error occured, Report it to jsmsj#5252 on Discord"
     }    
 }
 
