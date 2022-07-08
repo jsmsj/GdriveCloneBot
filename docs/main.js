@@ -87,7 +87,7 @@ function getAllUrlParams(url) {
 function get_auth_code(url){
     dict = getAllUrlParams(url)
     const all_perms = JSON.stringify(allpermutations(["https://www.googleapis.com/auth/drive","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/iam"]))
-    scopes__ = JSON.stringify(decodeURIComponent(dict.scope).split("+"))
+    scopes__ = JSON.stringify(decodeURIComponent(dict.scope).split(" "))
     if (all_perms.indexOf(scopes__) === -1){
       var scope = false
     }
