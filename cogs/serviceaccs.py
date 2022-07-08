@@ -52,16 +52,18 @@ class ServiceAccounts(commands.Cog):
                         }
                 }
                 flow = InstalledAppFlow.from_client_config(credentials,sascre.SCOPES)
-                flow.redirect_uri = 'http://localhost:1'
+                flow.redirect_uri = ''
                 auth_url, _ = flow.authorization_url()
-                em,view = embed(title="🧾 Service Accounts",description=f"Visit the following URL and the authorise. You will be redirected to a error page. That page's url would be something like: https://localhost:1/XXXXXXXXX\nCopy that url and send here within 2 minutes.\n\n{auth_url}",url=auth_url)
+                # em,view = embed(title="🧾 Service Accounts",description=f"Visit the following URL and the authorise. You will be redirected to a error page. That page's url would be something like: https://localhost:1/XXXXXXXXX\nCopy that url and send here within 2 minutes.\n\n{auth_url}",url=auth_url)
+                em,view = embed(title="🧾 Service Accounts",description=f"Visit the following URL and the authorise. Make sure to select all the scopes, copy the code and send it here within 2 minutes.\n\n{auth_url}",url=auth_url)
                 await ctx.send(embed=em,view=view)
                 msg:discord.Message = await self.bot.wait_for('message', check=lambda message : message.author == ctx.author and message.channel == ctx.channel, timeout=120)
                 sent_message = await ctx.reply("🕵️**Checking the received code...**")
                 try:
                     redir_url = msg.content
-                    query = urllib.parse.urlparse(redir_url).query
-                    code = urllib.parse.parse_qs(query)['code'][0]
+                    # query = urllib.parse.urlparse(redir_url).query
+                    # code = urllib.parse.parse_qs(query)['code'][0]
+                    code = redir_url
                     flow.fetch_token(code=code)
                     creds = flow.credentials
                     db.sascre_insert_creds(ctx.author.id,creds)
@@ -69,7 +71,8 @@ class ServiceAccounts(commands.Cog):
                     await sent_message.edit(embed=em)
                 except Exception as e:
                     logger.warning(e)
-                    em,view = embed(title='❗ Invalid Link',description='The link you have sent is invalid. Generate new one by the Authorization URL',url=auth_url)
+                    # em,view = embed(title='❗ Invalid Link',description='The link you have sent is invalid. Generate new one by the Authorization URL',url=auth_url)
+                    em,view = embed(title='❗ Invalid Code',description='The code you sent is invalid. Generate new one by the Authorization URL',url=auth_url)
                     await sent_message.edit(embed=em,view=view)
         else:
             em = embed(title="🧾 Service Accounts",description="You have already authorized for Service Accounts")[0]
