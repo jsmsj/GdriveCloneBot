@@ -24,11 +24,11 @@ def _list_sas(iam,project):
 class ServAcc:
     def __init__(self,user_id):
         self.user_id = user_id
-        self.scopes = ['https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/cloud-platform','https://www.googleapis.com/auth/iam']
+        self.scopes = ['https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/cloud-platform','https://www.googleapis.com/auth/iam','https://www.googleapis.com/auth/service.management']
         self.sleep_time = 30
         self.creds = db.sascre_find_creds(self.user_id)
         self._services = self.authorise()
-        self.services=['iam','drive']
+        self.services=['iam','drive','serviceusage','cloudresourcemanager']
         self.current_key_dump = []
     
     def authorise(self):

@@ -1,3 +1,27 @@
+<!-- Hi guys, I am trying to authorize using my credentials (Desktop app) for a project in python. i am hosting it on heroku. and i want to authorize the user for their google drive, so first of all i want to authorise the user via Oauth2, 
+```py
+flow = InstalledAppFlow.from_client_config(credentials,SCOPES)
+# flow.redirect_uri = 'https://mycustomuri.io/auth'
+flow.redirect_uri = 'http://localhost:1'
+auth_url, _ = flow.authorization_url(access_type='offline')
+send_redir_url(author_id)
+redir_url = get_redir_url_from_author(author_id)
+query = urllib.parse.urlparse(redir_url).query
+code = urllib.parse.parse_qs(query)['code'][0]
+flow.fetch_token(code=code)
+```
+so i want to use my custom redirect uri, but it gives me an error, i think it is related to the image attached, that is i cannot use a desktop app for custom redirect uris, and so i  will need to have the app run locally through a webserver.
+
+i could go on creating web credentials (custom uri works in that case) but the scopes which i have chosen are not supported over web type application
+
+the current workaround i have as you can see above in the code is that i send the author auth url with redirect as localhost:1 which is surely going to fail at the point google tries to redirect to that, then i ask user for the url they got the error on. for example it would look something like this:
+`http://localhost:1/?state=XXXXXXXXXXXXXXXXX&code=4/ALPHANUMERICCODE&scope=https://www.googleapis.com/auth/drive%20https://www.googleapis.com/auth/iam%20https://www.googleapis.com/auth/cloud-platform`
+
+then i use urllib module in python to extract the code `4/ALPHANUMERICCODE`
+and then i do flow.fetch_token(code)
+
+but i do not want the use this as it does not look good in production. 
+Q Is there any way to authorise via custom uri for desktop app ? -->
 <!DOCTYPE html>
 <html lang="en">
 <head>

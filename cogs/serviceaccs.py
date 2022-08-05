@@ -1,5 +1,6 @@
 """Imports"""
 import urllib
+import requests
 import os,shutil
 
 import discord
@@ -52,18 +53,19 @@ class ServiceAccounts(commands.Cog):
                         }
                 }
                 flow = InstalledAppFlow.from_client_config(credentials,sascre.SCOPES)
-                flow.redirect_uri = 'https://jsmsj.github.io/GdriveCloneBot/auth'
-                auth_url, _ = flow.authorization_url()
-                # em,view = embed(title="🧾 Service Accounts",description=f"Visit the following URL and the authorise. You will be redirected to a error page. That page's url would be something like: https://localhost:1/XXXXXXXXX\nCopy that url and send here within 2 minutes.\n\n{auth_url}",url=auth_url)
-                em,view = embed(title="🧾 Service Accounts",description=f"Visit the following URL and the authorise. Make sure to select all the scopes, copy the code and send it here within 2 minutes.\n\n{auth_url}",url=auth_url)
+                # flow.redirect_uri = 'https://jsmsj.github.io/GdriveCloneBot/auth'
+                flow.redirect_uri = 'http://localhost:1'
+                auth_url, _ = flow.authorization_url(access_type='offline')
+                em,view = embed(title="🧾 Service Accounts",description=f"Visit the following URL and the authorise. You will be redirected to a error page. That page's url would be something like: https://localhost:1/XXXXXXXXX\nCopy that url and send here within 2 minutes.\n\n{auth_url}",url=auth_url)
+                # em,view = embed(title="🧾 Service Accounts",description=f"Visit the following URL and the authorise. Make sure to select all the scopes, copy the code and send it here within 2 minutes.\n\n{auth_url}",url=auth_url)
                 await ctx.send(embed=em,view=view)
                 msg:discord.Message = await self.bot.wait_for('message', check=lambda message : message.author == ctx.author and message.channel == ctx.channel, timeout=120)
                 sent_message = await ctx.reply("🕵️**Checking the received code...**")
                 try:
                     redir_url = msg.content
-                    # query = urllib.parse.urlparse(redir_url).query
-                    # code = urllib.parse.parse_qs(query)['code'][0]
-                    code = redir_url
+                    query = urllib.parse.urlparse(redir_url).query
+                    code = urllib.parse.parse_qs(query)['code'][0]
+                    # code = redir_url
                     flow.fetch_token(code=code)
                     creds = flow.credentials
                     db.sascre_insert_creds(ctx.author.id,creds)
@@ -71,19 +73,12 @@ class ServiceAccounts(commands.Cog):
                     await sent_message.edit(embed=em)
                 except Exception as e:
                     logger.warning(e)
-                    # em,view = embed(title='❗ Invalid Link',description='The link you have sent is invalid. Generate new one by the Authorization URL',url=auth_url)
-                    em,view = embed(title='❗ Invalid Code',description='The code you sent is invalid. Generate new one by the Authorization URL',url=auth_url)
+                    em,view = embed(title='❗ Invalid Link',description='The link you have sent is invalid. Generate new one by the Authorization URL `gcb authsa`',url=auth_url)
+                    # em,view = embed(title='❗ Invalid Code',description='The code you sent is invalid. Generate new one by the Authorization URL',url=auth_url)
                     await sent_message.edit(embed=em,view=view)
         else:
             em = embed(title="🧾 Service Accounts",description="You have already authorized for Service Accounts")[0]
             await ctx.send(embed=em)
-
-    @is_allowed()
-    @commands.command()
-    async def revokesa(self,ctx):
-        db.sascre_delete_creds(ctx.author.id)
-        em = embed(f"🔓 Revoked current logged in account for Service Accounts successfully.","Use `gcb authsa` to authenticate again for service accounts.",None)[0]
-        await ctx.send(embed=em)
 
     @has_sa_creds()
     @is_allowed()
@@ -121,7 +116,7 @@ class ServiceAccounts(commands.Cog):
                 db.download_sas_projid(projectid)
             else:
                 sa_cls.download_keys(projectid)
-                db.create_db_inset_sas(projectid)
+                db.create_db_insert_sas(projectid)
             zip_sas_cre()
             await msg.edit(embed=embed("🧾 Service Accounts","Here is the zip file for your service accounts.")[0],file=discord.File('aaccounts.zip'))
         except Exception as e:
@@ -145,7 +140,7 @@ class ServiceAccounts(commands.Cog):
                 db.download_sas_projid(projectid)
             else:
                 sa_cls.download_keys(projectid)
-                db.create_db_inset_sas(projectid)
+                db.create_db_insert_sas(projectid)
             list_of_acc_fname = os.listdir('accounts')
             with open('emails.txt','a') as f:
                 for i in list_of_acc_fname:
@@ -161,7 +156,23 @@ class ServiceAccounts(commands.Cog):
             if os.path.exists('emails.txt'):
                 os.remove('emails.txt')    
         
-
+    @has_sa_creds()
+    @is_allowed()
+    @commands.command()
+    async def revokesa(self,ctx):
+        creds = db.sascre_find_creds(ctx.author.id)
+        if creds:
+            revoke = requests.post('https://accounts.google.com/o/oauth2/revoke',
+                    params={'token': creds.token},
+                    headers = {'content-type': 'application/x-www-form-urlencoded'})
+            if revoke.status_code == 200:
+                db.sascre_delete_creds(ctx.author.id)
+                await ctx.send(embed=embed("🔓 Revoked current logged in account for Service Accounts.","Use `gcb authsa` to authenticate again.",None)[0])
+            else:
+                await ctx.send(embed=embed("❗ Error | Unable to delete credentials",f"An error occured\nError: {revoke.json()['error']}\nDescription: {revoke.json()['error_description']}",None)[0])
+        else:
+            await ctx.send(embed=embed("🔓 Already Revoked","You haven't even signed in. Use `gcb authsa` to sign in.",None)[0])
+        
 def setup(bot):
     bot.add_cog(ServiceAccounts(bot))
     print("ServiceAccounts cog is loaded")

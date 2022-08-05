@@ -63,7 +63,7 @@ def show_progress_still(current:int,total:int,width:int):
 def status_emb(transferred:int,current_file_name,total_size:int):
     em = discord.Embed(title="📺 Status",color=discord.Color.green(),url="https://github.com/jsmsj/gdriveclonebot")
     em.set_footer(text="Made with 💖 by jsmsj")
-    em.description = f"Name: `{current_file_name}`\nStatus: Copying...📚\nCopied: {humanbytes(transferred)} of {humanbytes(total_size)}\n\n{show_progress_still(transferred,total_size,20)}🏁 {round(transferred*100/total_size,3)} %"
+    em.description = f"Current File: `{current_file_name}`\nStatus: Copying...📚\nCopied: {humanbytes(transferred)} of {humanbytes(total_size)}\n\n{show_progress_still(transferred,total_size,20)}🏁 {round(transferred*100/total_size,3)} %"
     return em
 
 def zip_sas_cre():

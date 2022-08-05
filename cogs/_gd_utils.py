@@ -65,7 +65,10 @@ class GoogleDrive:
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(15),
         retry=retry_if_exception_type(HttpError))
     def copyFile(self, file_id, dest_id):
-        body = {'parents': [dest_id]}
+        body = {
+            'parents': [dest_id],
+            'description': 'Uploaded by Gdrive Clone Bot'
+        }
         try:
             res = self.__service.files().copy(supportsAllDrives=True,fileId=file_id,body=body).execute()
             return res
@@ -114,7 +117,8 @@ class GoogleDrive:
             parent_id = self.__parent_id
         file_metadata = {
                 "name": directory_name,
-                "mimeType": self.__G_DRIVE_DIR_MIME_TYPE
+                "mimeType": self.__G_DRIVE_DIR_MIME_TYPE,
+                'description': 'Uploaded by Gdrive Clone Bot'
         }
         file_metadata["parents"] = [parent_id]
         file = self.__service.files().create(supportsTeamDrives=True, body=file_metadata).execute()

@@ -120,7 +120,7 @@ def find_sa_info_by_id(id):
 
 ###################################
 
-def create_db_inset_sas(project_id):
+def create_db_insert_sas(project_id):
     temp = db[f'sas_{project_id}']
     sas_folder = 'accounts'
     sa_files = os.listdir(sas_folder)
@@ -155,4 +155,15 @@ def has_credentials():
 def has_sa_creds():
     async def predicate(ctx:commands.Context):
         return True if sascre_find_creds(ctx.author.id) else False
+    return commands.check(predicate)
+
+
+def not_has_credentials():
+    async def predicate(ctx:commands.Context):
+        return False if find_creds(ctx.author.id) else True
+    return commands.check(predicate)
+
+def not_has_sa_creds():
+    async def predicate(ctx:commands.Context):
+        return False if sascre_find_creds(ctx.author.id) else True
     return commands.check(predicate)
