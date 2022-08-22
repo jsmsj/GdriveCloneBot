@@ -1,0 +1,25 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          region: eu
+        env:
+          HD_bot_token: ${{ secrets.bot_token }}
+          HD_allowed_user_ids: ${{ secrets.allowed_user_ids }}
+          HD_db_url: ${{ secrets.db_url }}
+          HD_G_DRIVE_CLIENT_ID: ${{ secrets.G_DRIVE_CLIENT_ID }}
+          HD_G_DRIVE_CLIENT_SECRET : ${{ secrets.G_DRIVE_CLIENT_SECRET }}
+          HD_prefix : ${{ secrets.prefix }}

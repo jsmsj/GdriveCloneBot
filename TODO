@@ -6,10 +6,11 @@ make tutorial
 drive selector
 bypasser
 search for files (with sorting options)
-heroku stuff
 webapp for this thing
 
 
 DONE:
 size cmd
 make help cmd
+log command
+heroku stuff

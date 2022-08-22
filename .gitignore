@@ -1,5 +1,5 @@
 *__pycache__*
-_config.py
 temporary/
 venv/
 log.txt
+.env

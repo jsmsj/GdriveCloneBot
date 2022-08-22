@@ -5,5 +5,5 @@ G_DRIVE_CLIENT_ID = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com
 G_DRIVE_CLIENT_SECRET = "xxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 """
-RENAME THIS FILE FROM _config_sample.py TO _config.py
+RENAME THIS FILE FROM _config_sample.py TO _config.py IF DEPLOYING MANUALLY AND DELETE THE _config.py file which exists already
 """
