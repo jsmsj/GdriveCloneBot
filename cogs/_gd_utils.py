@@ -17,6 +17,9 @@ from cogs._helpers import embed,status_emb
 # import asyncio
 from discord import Message
 from main import logger
+import logging
+
+logging.getLogger('googleapiclient.discovery').setLevel(logging.ERROR)
 
 
 class GoogleDrive:
@@ -44,7 +47,7 @@ class GoogleDrive:
             return parse_qs(parsed.query)['id'][0]
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(5),
-        retry=retry_if_exception_type(HttpError))
+        retry=retry_if_exception_type(HttpError), before=before_log(logger, logging.DEBUG))
     def getFilesByFolderId(self, folder_id):
             page_token = None
             q = f"'{folder_id}' in parents"
@@ -65,7 +68,7 @@ class GoogleDrive:
             return files
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(15),
-        retry=retry_if_exception_type(HttpError))
+        retry=retry_if_exception_type(HttpError), before=before_log(logger, logging.DEBUG))
     def copyFile(self, file_id, dest_id):
         body = {
             'parents': [dest_id],
@@ -82,9 +85,13 @@ class GoogleDrive:
                         self.switchSaIndex()
                         self.copyFile(file_id, dest_id)
                     else:
+                        logger.debug(reason)
                         raise IndexError(reason)
                 else:
+                    logger.error(err,exc_info=True)
                     raise err
+            else:
+                logger.error(err,exc_info=True)
 
     async def cloneFolder(self, name, local_path, folder_id, parent_id,msg:Message,total_size:int):
         files = self.getFilesByFolderId(folder_id)
@@ -107,11 +114,12 @@ class GoogleDrive:
                     await msg.edit(embed=emb)
                     new_id = parent_id
                 except Exception as err:
+                    logger.error(err,exc_info=True)
                     return err
         return new_id
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(5),
-        retry=retry_if_exception_type(HttpError))
+        retry=retry_if_exception_type(HttpError), before=before_log(logger, logging.DEBUG))
     def create_directory(self, directory_name,**kwargs):
         if not kwargs == {}:
             parent_id = kwargs.get('parent_id')
@@ -141,10 +149,10 @@ class GoogleDrive:
             if meta.get("mimeType") == self.__G_DRIVE_DIR_MIME_TYPE:
                 dir_id = self.create_directory(meta.get('name'),parent_id=self.__parent_id)
                 result = await self.cloneFolder(meta.get('name'), meta.get('name'), meta.get('id'), dir_id,msg,total_size)
-                return embed(title="✅ Copied successfully.",description=f"[{meta.get('name')}]({self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id)}) ---- `{humanbytes(self.transferred_size)}`\n{'#️⃣'*19+'▶️'} 100 % (`{humanbytes(int(self.transferred_size/(time.time()-self.start_time)))}/s avg`)",url=self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id))
+                return embed(title="✅ Copied successfully.",description=f"[{meta.get('name')}]({self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id)}) ---- `{humanbytes(self.transferred_size)}`\n{'#️⃣'*19+'▶️'} 100 % (`{humanbytes(int(self.transferred_size/(time.time()-self.start_time)))}/s`)",url=self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id))
             else:
                 file = self.copyFile(meta.get('id'), self.__parent_id)
-                return embed(title="✅ Copied successfully.",description=f"[{file.get('name')}]({self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id'))}) ---- `{humanbytes(int(meta.get('size')))}`\n{'#️⃣'*19+'▶️'} 100 % (`{humanbytes(int(int(meta.get('size'))/(time.time()-self.start_time)))}/s avg`)",url=self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id')))
+                return embed(title="✅ Copied successfully.",description=f"[{file.get('name')}]({self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id'))}) ---- `{humanbytes(int(meta.get('size')))}`\n{'#️⃣'*19+'▶️'} 100 % (`{humanbytes(int(int(meta.get('size'))/(time.time()-self.start_time)))}/s`)",url=self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id')))
         except Exception as err:
             if isinstance(err, RetryError):
                 err = err.last_attempt.exception()
@@ -153,11 +161,12 @@ class GoogleDrive:
 
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(5),
-        retry=retry_if_exception_type(HttpError))
+        retry=retry_if_exception_type(HttpError), before=before_log(logger, logging.DEBUG))
     def checkFolderLink(self, link: str):
         try:
             file_id = self.getIdFromUrl(link)
-        except (IndexError, KeyError):
+        except (IndexError, KeyError) as err:
+            logger.error(err,exc_info=True)
             raise IndexError
         try:
             file = self.__service.files().get(supportsAllDrives=True, fileId=file_id, fields="mimeType").execute()
@@ -168,6 +177,8 @@ class GoogleDrive:
                     return False, ["❗ File/Folder not found.", f"File id - {file_id} Not found. Make sure it exists and accessible by the logged in account."]
                 else:
                     return False, ["ERROR:", f"```py\n{str(err).replace('>', '').replace('<', '')}\n```"]
+            else:
+                logger.error(err,exc_info=True)
         if str(file.get('mimeType')) == self.__G_DRIVE_DIR_MIME_TYPE:
             return True, file_id
         else:
@@ -204,7 +215,8 @@ class GoogleDrive:
     def size(self,link):
         try:
             file_id = self.getIdFromUrl(link)
-        except (IndexError, KeyError):
+        except (IndexError, KeyError) as err:
+            logger.error(err,exc_info=True)
             return embed(title="❗ Invalid Google Drive URL",description="Make sure the Google Drive URL is in valid format.")
         size_serve = TotalSize(file_id,self.__service)
         total_size = size_serve.calc_size()
@@ -228,7 +240,7 @@ class GoogleDrive:
                 "private_key":sa_info["private_key"]
             }
             creds = service_account.Credentials.from_service_account_info(sa,scopes=self.__OAUTH_SCOPE)
-        return build('drive', 'v3', credentials=creds, cache_discovery=False)  #TODO add error handler-> DefaultCredentialsError: Could not automatically determine credentials. Please set GOOGLE_APPLICATION_CREDENTIALS or explicitly create credentials and re-run the application. For more information, please see https://cloud.google.com/docs/authentication/getting-started (happens when you clone without auth or sa)
+        return build('drive', 'v3', credentials=creds, cache_discovery=False)
 
 
 class TotalSize:

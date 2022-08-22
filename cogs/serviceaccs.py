@@ -72,7 +72,7 @@ class ServiceAccounts(commands.Cog):
                     em = embed(title="🧾 Service Accounts",description="You have successfully authorized for Service Accounts")[0]
                     await sent_message.edit(embed=em)
                 except Exception as e:
-                    logger.warning(e)
+                    logger.error(e,exc_info=True)
                     em,view = embed(title='❗ Invalid Link',description=f'The link you have sent is invalid. Generate new one by the Authorization URL `{prefix}authsa`',url=auth_url)
                     # em,view = embed(title='❗ Invalid Code',description='The code you sent is invalid. Generate new one by the Authorization URL',url=auth_url)
                     await sent_message.edit(embed=em,view=view)
@@ -120,7 +120,7 @@ class ServiceAccounts(commands.Cog):
             zip_sas_cre()
             await msg.edit(embed=embed("🧾 Service Accounts","Here is the zip file for your service accounts.")[0],file=discord.File('aaccounts.zip'))
         except Exception as e:
-            logger.warning(e)
+            logger.error(e,exc_info=True)
         finally:
             if os.path.exists('aaccounts.zip'):
                 os.remove('aaccounts.zip')
@@ -149,7 +149,7 @@ class ServiceAccounts(commands.Cog):
                     f.write(data["client_email"]+"\n")
             await msg.edit(embed=embed("🧾 Service Accounts","Here is the emails file.")[0],file=discord.File('emails.txt'))
         except Exception as e:
-            logger.warning(e)
+            logger.error(e,exc_info=True)
         finally:
             if os.path.exists('accounts'):
                 shutil.rmtree('accounts')

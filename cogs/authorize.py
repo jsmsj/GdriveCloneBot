@@ -7,6 +7,8 @@ import cogs._config
 from oauth2client.client import OAuth2WebServerFlow, FlowExchangeError
 from cogs._helpers import is_allowed,embed
 
+from main import logger
+
 OAUTH_SCOPE = "https://www.googleapis.com/auth/drive"
 REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"
 flow = OAuth2WebServerFlow(
@@ -46,6 +48,7 @@ class Auth(commands.Cog):
                 em,view = embed(title="⛓️ Authorize",description=f"To Authorize your Google Drive account visit this {auth_url} and send the generated code here, within 120 seconds.\n\nVisit the URL > Allow permissions > you will get a code > copy it > Send it here",url=auth_url)
                 await ctx.reply(embed=em,view=view)
             except Exception as e:
+                logger.error(e,exc_info=True)
                 em,view = embed("Error",f"```py\n{e}\n```",None)
                 return await ctx.reply(embed=em,view=view)
         msg = await self.bot.wait_for('message', check=lambda message : message.author == ctx.author and message.channel == ctx.channel, timeout=120)
@@ -61,10 +64,12 @@ class Auth(commands.Cog):
                 em = embed(title="🔐 Authorized Google Drive account Successfully.",description=f"Use `{cogs._config.prefix}revoke` to remove the current account.")[0]
                 await sent_message.edit(embed=em)
                 flow = None
-            except FlowExchangeError:
+            except FlowExchangeError as e:
+                logger.error(e,exc_info=True)
                 em,view = embed(title='❗ Invalid Code',description='The code you have sent is invalid or already used before. Generate new one by the Authorization URL',url=auth_url)
                 await sent_message.edit(embed=em,view=view)
             except Exception as e:
+                logger.error(e,exc_info=True)
                 em,view = embed("Error",f"```py\n{e}\n```",None)
                 return await ctx.reply(embed=em,view=view)
 

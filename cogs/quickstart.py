@@ -66,7 +66,7 @@ class Quickstart(commands.Cog):
             em,view = embed("🧾 Service Accounts","Added Service Accounts successfully.",None)
             await ctx.send(embed=em,view=view)
         except Exception as e:
-            logger.warning(e)
+            logger.error(e,exc_info=True)
         finally:
             if os.path.exists('aaccounts.zip'):
                 os.remove('aaccounts.zip')

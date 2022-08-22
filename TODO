@@ -1,6 +1,4 @@
-add checkfail
-improve oauth flow, preferably netlifyapp 
-errors :(
+improve oauth flow, preferably netlifyapp
 make tutorial/docs/readme
 bypasser
 search for files (with sorting options)
@@ -12,4 +10,6 @@ size cmd
 make help cmd
 log command
 heroku stuff
-lst_changelog 
+lst_changelog
+errors :(
+add checkfail

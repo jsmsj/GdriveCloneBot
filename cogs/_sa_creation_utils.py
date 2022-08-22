@@ -3,7 +3,7 @@ from base64 import b64decode
 from random import choice
 import os
 import traceback
-
+from main import logger
 from googleapiclient.discovery import build
 
 import cogs._db_helpers as db
@@ -96,8 +96,11 @@ class ServAcc:
                             }
                         ))
                     print("DOWNLOADING KEYSS !!!!!!")
+                    logger.critical('DOWNLOADING KEYSS !!!!!!')
+                    
                     batch.execute()
                     print("DOWNLOADED KEYSS !!!!!!")
+                    logger.critical('DOWNLOADED KEYSS !!!!!!')
                     if self.current_key_dump is None:
                         self.current_key_dump = []
                     else:
@@ -106,6 +109,7 @@ class ServAcc:
                                 f.write(j[1])
         except Exception as e:
             print(e)
+            logger.error(e,exc_info=True)
             traceback.print_exc()
 
     def _batch_keys_resp(self,id,resp,exception):

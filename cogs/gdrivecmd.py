@@ -71,7 +71,8 @@ class GdriveCmd(commands.Cog):
                     else:
                         e,v = embed(title=file_id[0],description=file_id[1],url=None)
                         await sent_message.edit(embed=e,view=v)
-                except IndexError:
+                except IndexError as e:
+                    logger.error(e,exc_info=True)
                     em,view = embed(title="❗Invalid Google Drive URL",description="Make sure the Google Drive URL is in valid format.",url=None)
                     await sent_message.edit(embed=em,view=view)
             else:
@@ -107,7 +108,7 @@ class GdriveCmd(commands.Cog):
                 em,view = embed("❗ Service Accounts","You didn't give me a zip file of service accounts. [2]",None)
                 await ctx.send(embed=em,view=view)
         except Exception as e:
-            logger.warning(e)
+            logger.error(e,exc_info=True)
         finally:
             if os.path.exists('sas.zip'):
                 os.remove('sas.zip')
@@ -136,6 +137,3 @@ class GdriveCmd(commands.Cog):
 def setup(bot):
     bot.add_cog(GdriveCmd(bot))
     print("GdriveCmd cog is loaded")
-
-
-#TODO CHECK FAILURE
