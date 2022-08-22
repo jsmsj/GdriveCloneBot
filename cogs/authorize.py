@@ -30,7 +30,7 @@ class Auth(commands.Cog):
         return
 
     @is_allowed()
-    @commands.command(aliases=['authorize'])
+    @commands.command(aliases=['authorize'],description=f'Used to authorise your Google Drive with the bot.\n`{cogs._config.prefix}auth`')
     async def auth(self,ctx):
         user_id = ctx.author.id
         creds = db.find_creds(user_id)
@@ -38,7 +38,7 @@ class Auth(commands.Cog):
         if creds is not None:
             creds.refresh(Http())
             db.insert_creds(user_id,creds)
-            em,view = embed(title="🔒 Already authorized your Google Drive Account.",description="Use `gcb revoke` to remove the current account.")
+            em,view = embed(title="🔒 Already authorized your Google Drive Account.",description=f"Use `{cogs._config.prefix}revoke` to remove the current account.")
             return await ctx.reply(embed=em,view=view)
         else:
             try:
@@ -58,7 +58,7 @@ class Auth(commands.Cog):
                 sent_message = await ctx.reply("🕵️**Checking the received code...**")
                 creds = flow.step2_exchange(token)
                 db.insert_creds(user_id,creds)
-                em = embed(title="🔐 Authorized Google Drive account Successfully.",description="Use `gcb revoke` to remove the current account.")[0]
+                em = embed(title="🔐 Authorized Google Drive account Successfully.",description=f"Use `{cogs._config.prefix}revoke` to remove the current account.")[0]
                 await sent_message.edit(embed=em)
                 flow = None
             except FlowExchangeError:
@@ -69,10 +69,10 @@ class Auth(commands.Cog):
                 return await ctx.reply(embed=em,view=view)
 
     @is_allowed()
-    @commands.command()
+    @commands.command(description=f'Used to revoke your Google Drive connected with the bot.\n`{cogs._config.prefix}revoke`')
     async def revoke(self,ctx):
         db.delete_creds(ctx.author.id)
-        em = embed(f"🔓 Revoked current logged in account successfully.","Use `gcb auth` to authenticate again and use this bot.",None)[0]
+        em = embed(f"🔓 Revoked current logged in account successfully.","Use `{cogs._config.prefix}auth` to authenticate again and use this bot.",None)[0]
         await ctx.send(embed=em)
 
 def setup(bot):

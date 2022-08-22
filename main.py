@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 intents = discord.Intents.all()
 
-bot = commands.Bot(command_prefix="gcb ", intents=intents, case_insensitive=True) # help_command=None,
+bot = commands.Bot(command_prefix=cogs._config.prefix, intents=intents, help_command=None, case_insensitive=True) 
 
 @bot.event
 async def on_ready():
@@ -31,7 +31,7 @@ async def on_command_error(ctx,error):
     if isinstance(error,commands.CommandNotFound):
         return
     elif isinstance(error,commands.CheckFailure):
-        await ctx.send("You do not have permission to run this command.\nOR\nYou have not authorized the bot with your account. Run `gcb auth` to authorize.\nOR\nYou are using a command related to service accounts, and have not authorized for it. Use `gcb authsa` to authorize for service accounts.")
+        await ctx.send(f"You do not have permission to run this command.\nOR\nYou have not authorized the bot with your account. Run `{cogs._config.prefix}auth` to authorize.\nOR\nYou are using a command related to service accounts, and have not authorized for it. Use `{cogs._config.prefix}authsa` to authorize for service accounts.")
     else:
         logger.warning(error)
 

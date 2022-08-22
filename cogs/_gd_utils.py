@@ -170,6 +170,43 @@ class GoogleDrive:
         else:
             return False, ["❗Invalid folder link.","The link you send does not belong to a folder."]
 
+    # def search_drive(self,query,orderby):
+    #     page_token = None
+    #     result = []
+    #     while True:
+    #         try:
+    #             param = {
+    #                 'corpora' : 'allDrives',
+    #                 'q': f"name contains '{query}'",
+    #                 'includeItemsFromAllDrives': True,
+    #                 'supportsAllDrives': True,
+    #                 'fields': 'nextPageToken, files(id, name)',
+    #                 'pageSize': 1000
+    #                 # 'orderBy':orderby
+    #             }
+    #             if page_token:
+    #                 param['pageToken'] = page_token
+                
+    #             all_files = self.__service.files().list(**param).execute()
+    #             print(all_files)
+    #             result.extend(all_files['files'])
+    #             page_token = all_files.get('nextPageToken')
+    #             if not page_token:
+    #                 break
+    #         except HttpError as e:
+    #             print(e)
+    #             break
+    #     return result
+
+    def size(self,link):
+        try:
+            file_id = self.getIdFromUrl(link)
+        except (IndexError, KeyError):
+            return embed(title="❗ Invalid Google Drive URL",description="Make sure the Google Drive URL is in valid format.")
+        size_serve = TotalSize(file_id,self.__service)
+        total_size = size_serve.calc_size()
+        return embed('💾 Size',f'{total_size} bytes\nor\n{humanbytes(total_size)}')
+
     def switchSaIndex(self):
         all_sas = db.find_sas()
         if self.sa_index == len(all_sas)-1:
@@ -243,3 +280,11 @@ class TotalSize:
             else:
                 self.gDrive_file(**file_)
     
+# orderBy	string	A comma-separated list of sort keys. Valid keys are 
+# 'createdTime', 'folder', 'modifiedByMeTime', 'modifiedTime', 'name',
+#  'name_natural', 'quotaBytesUsed', 'recency', 'sharedWithMeTime',
+#  'starred', and 'viewedByMeTime'. Each key sorts ascending by default,
+#  but may be reversed with the 'desc' modifier. Example usage: 
+# ?orderBy=folder,modifiedTime desc,name. Please note that there is a current 
+# limitation for users with approximately one million files in which the 
+# requested sort order is ignored.

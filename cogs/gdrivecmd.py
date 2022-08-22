@@ -7,6 +7,7 @@ import cogs._db_helpers as db
 from cogs._db_helpers import has_credentials
 from cogs._helpers import extract_sas,is_allowed,embed
 from main import logger
+import cogs._config
 
 class GdriveCmd(commands.Cog):
     """GdriveCmd commands"""
@@ -23,7 +24,7 @@ class GdriveCmd(commands.Cog):
 
     @is_allowed()
     @has_credentials()
-    @commands.command()
+    @commands.command(description=f'Used to clone Files/Folders which you can access but your Service Accounts cannot.\n`{cogs._config.prefix}privclone gdrive_link`')
     async def privclone(self,ctx,*,link=None):
         user_id = ctx.author.id
         if link:
@@ -33,12 +34,12 @@ class GdriveCmd(commands.Cog):
             emb,vieww = await user_gd_cls.clone(sent_message,link)
             await sent_message.edit(embed=emb,view=vieww)
         else:
-            em,view = embed(title="❗ Provide a valid Google Drive URL along with commmand.",description="```\nUsage -> gcb privclone (GDrive Link)\n```")
+            em,view = embed(title="❗ Provide a valid Google Drive URL along with commmand.",description=f"```\nUsage -> {cogs._config.prefix}privclone (GDrive Link)\n```")
             await ctx.reply(embed=em,view=view)
 
     @is_allowed()
     @has_credentials()
-    @commands.command()
+    @commands.command(description=f'Used to clone Files/Folders which your Service Accounts can access.\n`{cogs._config.prefix}pubclone gdrive_link`')
     async def pubclone(self,ctx,*,link=None):
         user_id = ctx.author.id
         if link:
@@ -48,12 +49,12 @@ class GdriveCmd(commands.Cog):
             emb,vieww = await user_gd_cls.clone(sent_message,link)
             await sent_message.edit(embed=emb,view=vieww)
         else:
-            em,view = embed(title="❗ Provide a valid Google Drive URL along with commmand.",description="```\nUsage -> gcb pubclone (GDrive Link)\n```")
+            em,view = embed(title="❗ Provide a valid Google Drive URL along with commmand.",description=f"```\nUsage -> {cogs._config.prefix}pubclone (GDrive Link)\n```")
             await ctx.reply(embed=em,view=view)
 
     @is_allowed()
     @has_credentials()
-    @commands.command()
+    @commands.command(description=f'Used to set the defaut cloning location.\n`{cogs._config.prefix}set_folder gdrive_link`')
     async def set_folder(self,ctx,*,link=None):
         user_id = ctx.author.id
         if link:
@@ -65,7 +66,7 @@ class GdriveCmd(commands.Cog):
                     result, file_id = gdrive.checkFolderLink(link)
                     if result:
                         db.insert_parent_id(user_id,file_id)
-                        em,view = embed(title="🆔 ✅ Custom Folder link set successfully.",description=f"Your custom folder id - `{file_id}`\n\nUse `gcb set_folder clear` to clear it.",url=None)
+                        em,view = embed(title="🆔 ✅ Custom Folder link set successfully.",description=f"Your custom folder id - `{file_id}`\n\nUse `{cogs._config.prefix}set_folder clear` to clear it.",url=None)
                         await sent_message.edit(embed=em,view=view)
                     else:
                         e,v = embed(title=file_id[0],description=file_id[1],url=None)
@@ -75,14 +76,14 @@ class GdriveCmd(commands.Cog):
                     await sent_message.edit(embed=em,view=view)
             else:
                 db.delete_parent_id(user_id)
-                em,view = embed("🆔 🚮 Custom Folder ID Cleared Successfuly.","Use `gcb set_folder (Folder Link)` to set it back.",None)
+                em,view = embed("🆔 🚮 Custom Folder ID Cleared Successfuly.",f"Use `{cogs._config.prefix}set_folder (Folder Link)` to set it back.",None)
                 await ctx.reply(embed=em,view=view)
         else:
-            em,view = embed("🆔 Set Folder", f"Your Current Custom Folder ID- `{db.find_parent_id(user_id)}`\n\nUse `gcb set_folder (Folder Link)` to change it.",None)
+            em,view = embed("🆔 Set Folder", f"Your Current Custom Folder ID- `{db.find_parent_id(user_id)}`\n\nUse `{cogs._config.prefix}set_folder (Folder Link)` to change it.",None)
             await ctx.reply(embed=em,view=view)
 
     @is_allowed()
-    @commands.command()
+    @commands.command(description=f'Set the Service Accounts which the bot will use.\n`{cogs._config.prefix}uploadsas zip_file_attachment`')
     async def uploadsas(self,ctx: commands.Context):
         try:
             if len(ctx.message.attachments) !=0:
@@ -112,6 +113,25 @@ class GdriveCmd(commands.Cog):
                 os.remove('sas.zip')
             if os.path.exists('sas'):
                 shutil.rmtree('sas')
+
+    # @is_allowed()
+    # @has_credentials()
+    # @commands.command()
+    # async def search(self,ctx,orderby,*,query):
+    #     gdrive = GoogleDrive(ctx.author.id,use_sa=False)
+    #     files = gdrive.search_drive(query,orderby)
+
+    #     print(files)
+
+    @is_allowed()
+    @has_credentials()
+    @commands.command(description=f'Get size of a google drive file/folder.\n`{cogs._config.prefix}size gdrive_link`')
+    async def size(self,ctx,*,url):
+        msg = await ctx.reply(embed=embed('💾 Size','Calculating Size ....\nPlease wait')[0])
+        gdrive = GoogleDrive(ctx.author.id,use_sa=False)
+        emb = gdrive.size(url)[0]
+        await msg.edit(embed=emb)
+
 
 def setup(bot):
     bot.add_cog(GdriveCmd(bot))

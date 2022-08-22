@@ -11,6 +11,7 @@ import cogs._sa_creation_utils as sascre
 from cogs._db_helpers import not_has_sa_creds,not_has_credentials
 from cogs._helpers import embed, is_allowed, zip_sas_cre
 import os
+import cogs._config
 
 
 class Quickstart(commands.Cog):
@@ -29,12 +30,12 @@ class Quickstart(commands.Cog):
     @is_allowed()
     @not_has_credentials()
     @not_has_sa_creds()
-    @commands.command()
+    @commands.command(description=f'Quick start, with this you will be able to authorise google drive, create service accounts, and those service accounts will be used by the bot.\nBasically used to quickstart the bot incase you don\'t have service accounts with you.\n`{cogs._config.prefix}makeithappen`')
     async def makeithappen(self,ctx:commands.Context,projectid=None,link=None):
         if not projectid:
-            return await ctx.send("Error: No project id found, correct usage `gcb quickstart projectid link`.")
+            return await ctx.send(f"Error: No project id found, correct usage `{cogs._config.prefix}makeithappen projectid link`.")
         if not link:
-            return await ctx.send("Error: No folder id found, correct usage `gcb quickstart projectid link`.")
+            return await ctx.send("Error: No folder id found, correct usage `{cogs._config.prefix}makeithappen projectid link`.")
         await ctx.invoke(self.bot.get_command('authsa'))
         await ctx.invoke(self.bot.get_command('auth'))
         await ctx.invoke(self.bot.get_command('createsa'), projectid=projectid)
@@ -75,7 +76,7 @@ class Quickstart(commands.Cog):
                 os.remove('emails.txt')
 
         await ctx.invoke(self.bot.get_command('set_folder'),link=link)
-        em = embed("🎌 Congratulations","Setup done successfully, now you can clone public as well as private links!\nCommands:\n`gcb pubclone drive.google.com/XXXXXXXX`\n`gcb privclone drive.google.com/XXXXXXXX`\nTo get help on above commands run `gcb help cmd_name`",None)[0]
+        em = embed("🎌 Congratulations",f"Setup done successfully, now you can clone public as well as private links!\nCommands:\n`{cogs._config.prefix}pubclone drive.google.com/XXXXXXXX`\n`{cogs._config.prefix}privclone drive.google.com/XXXXXXXX`\nTo get help on above commands run `{cogs._config.prefix}help cmd_name`",None)[0]
         await ctx.send(embed=em)
 
     @makeithappen.error

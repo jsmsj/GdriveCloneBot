@@ -10,7 +10,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 
 import cogs._db_helpers as db
 import cogs._sa_creation_utils as sascre
-from cogs._config import G_DRIVE_CLIENT_ID, G_DRIVE_CLIENT_SECRET
+from cogs._config import G_DRIVE_CLIENT_ID, G_DRIVE_CLIENT_SECRET,prefix
 from cogs._db_helpers import has_sa_creds
 from cogs._helpers import is_allowed,embed,zip_sas_cre
 import json
@@ -30,7 +30,7 @@ class ServiceAccounts(commands.Cog):
         return
 
     @is_allowed()
-    @commands.command()
+    @commands.command(description=f'Use this to authorize for managing Service Accounts.\n`{prefix}authsa`')
     async def authsa(self,ctx):
         creds = db.sascre_find_creds(ctx.author.id)
         if not creds or not creds.valid:
@@ -73,7 +73,7 @@ class ServiceAccounts(commands.Cog):
                     await sent_message.edit(embed=em)
                 except Exception as e:
                     logger.warning(e)
-                    em,view = embed(title='❗ Invalid Link',description='The link you have sent is invalid. Generate new one by the Authorization URL `gcb authsa`',url=auth_url)
+                    em,view = embed(title='❗ Invalid Link',description=f'The link you have sent is invalid. Generate new one by the Authorization URL `{prefix}authsa`',url=auth_url)
                     # em,view = embed(title='❗ Invalid Code',description='The code you sent is invalid. Generate new one by the Authorization URL',url=auth_url)
                     await sent_message.edit(embed=em,view=view)
         else:
@@ -82,7 +82,7 @@ class ServiceAccounts(commands.Cog):
 
     @has_sa_creds()
     @is_allowed()
-    @commands.command()
+    @commands.command(description=f'List the project ids of available projects in your google cloud console.\n`{prefix}listprjects`')
     async def listprojects(self,ctx):
         sa_cls = sascre.ServAcc(ctx.author.id)
         desc = "```\n"
@@ -94,22 +94,22 @@ class ServiceAccounts(commands.Cog):
 
     @has_sa_creds()
     @is_allowed()
-    @commands.command()
+    @commands.command(description=f'Create the service accounts in a given project.\n`{prefix}createsa projectId`')
     async def createsa(self,ctx,projectid=None):
         if not projectid:
-            return await ctx.send("Error: No project id found, correct usage `gcb createsa projectid` . Checkout the list of project ids via `gcb listprojects` command.")
+            return await ctx.send(f"Error: No project id found, correct usage `{prefix}createsa projectid` . Checkout the list of project ids via `{prefix}listprojects` command.")
         sa_cls = sascre.ServAcc(ctx.author.id)
         sa_cls.enableservices(projectid)
         sa_cls.createsas(projectid)
-        await ctx.send(embed=embed(title="🧾 Service Accounts",description="Successfully Created Service accounts, use `gcb downloadsazip` to get the service accounts in json format.\nUse `gcb saemails` to get the emails of the service accounts.",url=None)[0])
+        await ctx.send(embed=embed(title="🧾 Service Accounts",description=f"Successfully Created Service accounts, use `{prefix}downloadsazip` to get the service accounts in json format.\nUse `{prefix}saemails` to get the emails of the service accounts.",url=None)[0])
 
     @has_sa_creds()
     @is_allowed()
-    @commands.command()
+    @commands.command(description=f'Get the Service accounts for a projectId as a zip file.\n`{prefix}downloadsazip projectId`')
     async def downloadsazip(self,ctx,projectid=None):
         try:
             if not projectid:
-                return await ctx.send("Error: No project id found, correct usage `gcb downloadsazip projectid` . Checkout the list of project ids via `gcb listprojects` command.")
+                return await ctx.send(f"Error: No project id found, correct usage `{prefix}downloadsazip projectid` . Checkout the list of project ids via `{prefix}listprojects` command.")
             sa_cls = sascre.ServAcc(ctx.author.id)
             msg = await ctx.send(embed=embed(title="🧾 Service Accounts",description="Downloading the accounts, please wait ...")[0])
             if db.sas_for_projid_exists(projectid):
@@ -129,11 +129,11 @@ class ServiceAccounts(commands.Cog):
     
     @has_sa_creds()
     @is_allowed()
-    @commands.command()
+    @commands.command(description=f'Get the Service Accounts Emails for a projectId.\n`{prefix}saemails projectId`')
     async def saemails(self,ctx,projectid=None):
         try:
             if not projectid:
-                return await ctx.send("Error: No project id found, correct usage `gcb saemails projectid` . Checkout the list of project ids via `gcb listprojects` command.")
+                return await ctx.send(f"Error: No project id found, correct usage `{prefix}saemails projectid` . Checkout the list of project ids via `{prefix}listprojects` command.")
             msg = await ctx.send(embed=embed(title="🧾 Service Accounts",description="Getting emails please wait ...")[0])
             sa_cls = sascre.ServAcc(ctx.author.id)
             if db.sas_for_projid_exists(projectid):
@@ -158,7 +158,7 @@ class ServiceAccounts(commands.Cog):
         
     @has_sa_creds()
     @is_allowed()
-    @commands.command()
+    @commands.command(description=f'Used to revoke your account connected to Service Accounts with the bot.\n`{prefix}revokesa`')
     async def revokesa(self,ctx):
         creds = db.sascre_find_creds(ctx.author.id)
         if creds:
@@ -167,11 +167,11 @@ class ServiceAccounts(commands.Cog):
                     headers = {'content-type': 'application/x-www-form-urlencoded'})
             if revoke.status_code == 200:
                 db.sascre_delete_creds(ctx.author.id)
-                await ctx.send(embed=embed("🔓 Revoked current logged in account for Service Accounts.","Use `gcb authsa` to authenticate again.",None)[0])
+                await ctx.send(embed=embed("🔓 Revoked current logged in account for Service Accounts.",f"Use `{prefix}authsa` to authenticate again.",None)[0])
             else:
                 await ctx.send(embed=embed("❗ Error | Unable to delete credentials",f"An error occured\nError: {revoke.json()['error']}\nDescription: {revoke.json()['error_description']}",None)[0])
         else:
-            await ctx.send(embed=embed("🔓 Already Revoked","You haven't even signed in. Use `gcb authsa` to sign in.",None)[0])
+            await ctx.send(embed=embed("🔓 Already Revoked",f"You haven't even signed in. Use `{prefix}authsa` to sign in.",None)[0])
         
 def setup(bot):
     bot.add_cog(ServiceAccounts(bot))
