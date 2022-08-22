@@ -4,6 +4,7 @@ import discord
 import os
 import cogs._config
 import shutil,os
+from cogs._helpers import embed
 
 if os.path.exists('log.txt'):
     with open('log.txt', 'r+') as f:
@@ -25,7 +26,7 @@ async def on_ready():
     print("Bot is ready!")
 
 @bot.event
-async def on_command_error(ctx,error):
+async def on_command_error(ctx:commands.Context,error):
     if hasattr(ctx.command, 'on_error'):
         return
     if isinstance(error,commands.CommandNotFound):
@@ -34,6 +35,10 @@ async def on_command_error(ctx,error):
         await ctx.send(f"You do not have permission to run this command.\nOR\nYou have not authorized the bot with your account. Run `{cogs._config.prefix}auth` to authorize.\nOR\nYou are using a command related to service accounts, and have not authorized for it. Use `{cogs._config.prefix}authsa` to authorize for service accounts.")
     else:
         logger.warning(error)
+        _file=None
+        if os.path.exists('log.txt'):
+            _file = discord.File('log.txt')
+        await ctx.send(embed=embed(f'Error | {ctx.command.name}',f'An error occured, kindly report it to jsmsj#5252.\n```py\n{error}\n```\nHere is the attached logfile.')[0],file=_file)
 
 if __name__ == '__main__':
     # When running this file, if it is the 'main' file

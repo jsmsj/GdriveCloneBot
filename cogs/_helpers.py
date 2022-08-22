@@ -5,6 +5,7 @@ from cogs._config import allowed_user_ids
 import zipfile
 import shutil
 import os
+import time
 
 
 def is_allowed():
@@ -60,10 +61,10 @@ def show_progress_still(current:int,total:int,width:int):
         hashblocks = 0
     return "#️⃣"* hashblocks + "▶️" + "🟦"*(width-hashblocks-1)
 
-def status_emb(transferred:int,current_file_name,total_size:int):
-    em = discord.Embed(title="📺 Status",color=discord.Color.green(),url="https://github.com/jsmsj/gdriveclonebot")
+def status_emb(transferred:int,current_file_name,total_size:int,start_time):
+    em = discord.Embed(title="📺 Status : Copying...",color=discord.Color.green(),url="https://github.com/jsmsj/gdriveclonebot")
     em.set_footer(text="Made with 💖 by jsmsj")
-    em.description = f"Current File: `{current_file_name}`\nStatus: Copying...📚\nCopied: {humanbytes(transferred)} of {humanbytes(total_size)}\n\n{show_progress_still(transferred,total_size,20)}🏁 {round(transferred*100/total_size,3)} %"
+    em.description = f"Current File: `{current_file_name}`\nStatus: Copying...📚\nCopied: {humanbytes(transferred)} of {humanbytes(total_size)} (`{humanbytes(int(transferred/(time.time()-start_time)))}/s`)\n\n{show_progress_still(transferred,total_size,20)}🏁 {round(transferred*100/total_size,3)} %"
     return em
 
 def zip_sas_cre():

@@ -1,12 +1,10 @@
 add checkfail
-make readme
 improve oauth flow, preferably netlifyapp 
 errors :(
-make tutorial
+make tutorial/docs/readme
 bypasser
 search for files (with sorting options)
 webapp for this thing
-lst_changelog update @github raw, change embed (add field if new changelog) (db thingy)
 
 
 DONE:
@@ -14,3 +12,4 @@ size cmd
 make help cmd
 log command
 heroku stuff
+lst_changelog 

@@ -43,5 +43,10 @@
         "title":"add changelog.json",
         "description":"Make a file which shows recent changes to the bot",
         "timestamp":1661179970
+    },
+    "10":{
+        "title":"added speed",
+        "description":"shows speed now while cloning",
+        "timestamp":1661182170
     }
 }

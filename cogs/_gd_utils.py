@@ -16,6 +16,8 @@ from google.oauth2 import service_account
 from cogs._helpers import embed,status_emb
 # import asyncio
 from discord import Message
+from main import logger
+
 
 class GoogleDrive:
     def __init__(self, user_id,use_sa):
@@ -101,7 +103,7 @@ class GoogleDrive:
                     pass
                 try:
                     self.copyFile(file.get('id'), parent_id)
-                    emb = status_emb(transferred = self.transferred_size,current_file_name = file.get('name'),total_size=total_size)
+                    emb = status_emb(transferred = self.transferred_size,current_file_name = file.get('name'),total_size=total_size,start_time=self.start_time)
                     await msg.edit(embed=emb)
                     new_id = parent_id
                 except Exception as err:
@@ -127,6 +129,7 @@ class GoogleDrive:
 
     async def clone(self,msg:Message,link):
         self.transferred_size = 0
+        self.start_time = time.time()
         try:
             file_id = self.getIdFromUrl(link)
         except (IndexError, KeyError):
@@ -138,10 +141,10 @@ class GoogleDrive:
             if meta.get("mimeType") == self.__G_DRIVE_DIR_MIME_TYPE:
                 dir_id = self.create_directory(meta.get('name'),parent_id=self.__parent_id)
                 result = await self.cloneFolder(meta.get('name'), meta.get('name'), meta.get('id'), dir_id,msg,total_size)
-                return embed(title="✅ Copied successfully.",description=f"[{meta.get('name')}]({self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id)}) ---- `{humanbytes(self.transferred_size)}`\n{'#️⃣'*19+'▶️'} 100 %",url=self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id))
+                return embed(title="✅ Copied successfully.",description=f"[{meta.get('name')}]({self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id)}) ---- `{humanbytes(self.transferred_size)}`\n{'#️⃣'*19+'▶️'} 100 % (`{humanbytes(int(self.transferred_size/(time.time()-self.start_time)))}/s avg`)",url=self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id))
             else:
                 file = self.copyFile(meta.get('id'), self.__parent_id)
-                return embed(title="✅ Copied successfully.",description=f"[{file.get('name')}]({self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id'))}) ---- `{humanbytes(int(meta.get('size')))}`\n{'#️⃣'*19+'▶️'} 100 %",url=self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id')))
+                return embed(title="✅ Copied successfully.",description=f"[{file.get('name')}]({self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id'))}) ---- `{humanbytes(int(meta.get('size')))}`\n{'#️⃣'*19+'▶️'} 100 % (`{humanbytes(int(int(meta.get('size'))/(time.time()-self.start_time)))}/s avg`)",url=self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id')))
         except Exception as err:
             if isinstance(err, RetryError):
                 err = err.last_attempt.exception()
