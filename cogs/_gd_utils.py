@@ -220,7 +220,7 @@ class GoogleDrive:
             return embed(title="❗ Invalid Google Drive URL",description="Make sure the Google Drive URL is in valid format.")
         size_serve = TotalSize(file_id,self.__service)
         total_size = size_serve.calc_size()
-        return embed('💾 Size',f'{total_size} bytes\nor\n{humanbytes(total_size)}')
+        return embed('💾 Size',f'`{total_size} bytes`\nor\n`{humanbytes(total_size)}`')
 
     def switchSaIndex(self):
         all_sas = db.find_sas()

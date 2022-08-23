@@ -30,12 +30,12 @@ class Quickstart(commands.Cog):
     @is_allowed()
     @not_has_credentials()
     @not_has_sa_creds()
-    @commands.command(description=f'Quick start, with this you will be able to authorise google drive, create service accounts, and those service accounts will be used by the bot.\nBasically used to quickstart the bot incase you don\'t have service accounts with you.\n`{cogs._config.prefix}makeithappen`')
+    @commands.command(description=f'Quick start, with this you will be able to authorise google drive, create service accounts, and those service accounts will be used by the bot.\nBasically used to quickstart the bot incase you don\'t have service accounts with you.\n`{cogs._config.prefix}makeithappen projectid link`',aliases=['quickstart'])
     async def makeithappen(self,ctx:commands.Context,projectid=None,link=None):
         if not projectid:
             return await ctx.send(f"Error: No project id found, correct usage `{cogs._config.prefix}makeithappen projectid link`.")
         if not link:
-            return await ctx.send("Error: No folder id found, correct usage `{cogs._config.prefix}makeithappen projectid link`.")
+            return await ctx.send(f"Error: No folder id found, correct usage `{cogs._config.prefix}makeithappen projectid link`.")
         await ctx.invoke(self.bot.get_command('authsa'))
         await ctx.invoke(self.bot.get_command('auth'))
         await ctx.invoke(self.bot.get_command('createsa'), projectid=projectid)

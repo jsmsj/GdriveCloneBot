@@ -1,5 +1,6 @@
 """Imports"""
 import discord
+import urllib.parse
 import asyncio
 from discord.ext import commands
 import cogs._db_helpers as db
@@ -11,7 +12,8 @@ from cogs._helpers import is_allowed,embed
 from main import logger
 
 OAUTH_SCOPE = "https://www.googleapis.com/auth/drive"
-REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"
+# REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"
+REDIRECT_URI = "http://localhost:1/"
 flow = OAuth2WebServerFlow(
                         cogs._config.G_DRIVE_CLIENT_ID,
                         cogs._config.G_DRIVE_CLIENT_SECRET,
@@ -46,7 +48,7 @@ class Auth(commands.Cog):
         else:
             try:
                 auth_url = flow.step1_get_authorize_url()
-                em,view = embed(title="⛓️ Authorize",description=f"To Authorize your Google Drive account visit this {auth_url} and send the generated code here, within 120 seconds.\n\nVisit the URL > Allow permissions > you will get a code > copy it > Send it here",url=auth_url)
+                em,view = embed(title="⛓️ Authorize",description=f"Visit the following URL and the authorise. You will be redirected to a **error page**. That page's url would be something like:\nhttps://localhost:1/XXXXXXXXX\n\nCopy that url and send here within 2 minutes.\n\n{auth_url}",url=auth_url)
                 await ctx.reply(embed=em,view=view)
             except Exception as e:
                 logger.error(e,exc_info=True)
@@ -56,26 +58,29 @@ class Auth(commands.Cog):
             msg = await self.bot.wait_for('message', check=lambda message : message.author == ctx.author and message.channel == ctx.channel, timeout=120)
         except asyncio.TimeoutError:
             return await ctx.send(embed=embed('Error | Timed out','You did not respond in time. Re run the command and try to respond under 120 seconds.')[0])
-        token = msg.content
-        WORD = len(token)
-        if WORD == 62 and token[1] == "/":
-            creds = None
-            try:
-                user_id = ctx.author.id
-                sent_message = await ctx.reply("🕵️**Checking the received code...**")
-                creds = flow.step2_exchange(token)
-                db.insert_creds(user_id,creds)
-                em = embed(title="🔐 Authorized Google Drive account Successfully.",description=f"Use `{cogs._config.prefix}revoke` to remove the current account.")[0]
-                await sent_message.edit(embed=em)
-                flow = None
-            except FlowExchangeError as e:
-                logger.error(e,exc_info=True)
-                em,view = embed(title='❗ Invalid Code',description='The code you have sent is invalid or already used before. Generate new one by the Authorization URL',url=auth_url)
-                await sent_message.edit(embed=em,view=view)
-            except Exception as e:
-                logger.error(e,exc_info=True)
-                em,view = embed("Error",f"```py\n{e}\n```",None)
-                return await ctx.reply(embed=em,view=view)
+        # token = msg.content
+        # WORD = len(token)
+        # if WORD == 62 and token[1] == "/":
+        creds = None
+        try:
+            redir_url = msg.content
+            query = urllib.parse.urlparse(redir_url).query
+            code = urllib.parse.parse_qs(query)['code'][0]
+            user_id = ctx.author.id
+            sent_message = await ctx.reply("🕵️**Checking the received code...**")
+            creds = flow.step2_exchange(code)
+            db.insert_creds(user_id,creds)
+            em = embed(title="🔐 Authorized Google Drive account Successfully.",description=f"Use `{cogs._config.prefix}revoke` to remove the current account.")[0]
+            await sent_message.edit(embed=em)
+            flow = None
+        except FlowExchangeError as e:
+            logger.error(e,exc_info=True)
+            em,view = embed(title='❗ Invalid Code',description='The code you have sent is invalid or already used before. Generate new one by the Authorization URL',url=auth_url)
+            await sent_message.edit(embed=em,view=view)
+        except Exception as e:
+            logger.error(e,exc_info=True)
+            em,view = embed("Error",f"```py\n{e}\n```",None)
+            return await ctx.reply(embed=em,view=view)
 
     @is_allowed()
     @commands.command(description=f'Used to revoke your Google Drive connected with the bot.\n`{cogs._config.prefix}revoke`')

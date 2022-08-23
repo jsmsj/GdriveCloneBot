@@ -1,5 +1,5 @@
 """Imports"""
-import urllib
+import urllib.parse
 import requests
 import os,shutil
 import asyncio
@@ -57,7 +57,7 @@ class ServiceAccounts(commands.Cog):
                 # flow.redirect_uri = 'https://jsmsj.github.io/GdriveCloneBot/auth'
                 flow.redirect_uri = 'http://localhost:1'
                 auth_url, _ = flow.authorization_url(access_type='offline')
-                em,view = embed(title="🧾 Service Accounts",description=f"Visit the following URL and the authorise. You will be redirected to a error page. That page's url would be something like: https://localhost:1/XXXXXXXXX\nCopy that url and send here within 2 minutes.\n\n{auth_url}",url=auth_url)
+                em,view = embed(title="🧾 Service Accounts",description=f"Visit the following URL and the authorise. You will be redirected to a **error page**. That page's url would be something like:\nhttps://localhost:1/XXXXXXXXX\n\nCopy that url and send here within 2 minutes.\n\n{auth_url}",url=auth_url)
                 # em,view = embed(title="🧾 Service Accounts",description=f"Visit the following URL and the authorise. Make sure to select all the scopes, copy the code and send it here within 2 minutes.\n\n{auth_url}",url=auth_url)
                 await ctx.send(embed=em,view=view)
                 try:

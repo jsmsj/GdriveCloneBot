@@ -58,5 +58,10 @@
         "title":"add readme etc.",
         "description":"Added a readme file, and updated the site to show changelog and readme",
         "timestamp":1661257002
+    },
+    "13":{
+        "title":"add upstream merge + others",
+        "description":"Added a workflow to automatically merge upstream and fixed authorization method. and a few missing f strings",
+        "timestamp":1661275153
     }
 }
