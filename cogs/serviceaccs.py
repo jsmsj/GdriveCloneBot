@@ -2,6 +2,7 @@
 import urllib
 import requests
 import os,shutil
+import asyncio
 
 import discord
 from discord.ext import commands
@@ -59,7 +60,10 @@ class ServiceAccounts(commands.Cog):
                 em,view = embed(title="🧾 Service Accounts",description=f"Visit the following URL and the authorise. You will be redirected to a error page. That page's url would be something like: https://localhost:1/XXXXXXXXX\nCopy that url and send here within 2 minutes.\n\n{auth_url}",url=auth_url)
                 # em,view = embed(title="🧾 Service Accounts",description=f"Visit the following URL and the authorise. Make sure to select all the scopes, copy the code and send it here within 2 minutes.\n\n{auth_url}",url=auth_url)
                 await ctx.send(embed=em,view=view)
-                msg:discord.Message = await self.bot.wait_for('message', check=lambda message : message.author == ctx.author and message.channel == ctx.channel, timeout=120)
+                try:
+                    msg:discord.Message = await self.bot.wait_for('message', check=lambda message : message.author == ctx.author and message.channel == ctx.channel, timeout=120)
+                except asyncio.TimeoutError:
+                    return await ctx.send(embed=embed('Error | Timed out','You did not respond in time. Re run the command and try to respond under 120 seconds.')[0])
                 sent_message = await ctx.reply("🕵️**Checking the received code...**")
                 try:
                     redir_url = msg.content

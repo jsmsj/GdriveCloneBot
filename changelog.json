@@ -53,5 +53,10 @@
         "title":"logging added",
         "description":"Added logging to various modules and added errors.",
         "timestamp":1661184750
+    },
+    "12":{
+        "title":"add readme etc.",
+        "description":"Added a readme file, and updated the site to show changelog and readme",
+        "timestamp":1661257002
     }
 }

@@ -1,5 +1,6 @@
 """Imports"""
 import discord
+import asyncio
 from discord.ext import commands
 import cogs._db_helpers as db
 from httplib2 import Http
@@ -51,7 +52,10 @@ class Auth(commands.Cog):
                 logger.error(e,exc_info=True)
                 em,view = embed("Error",f"```py\n{e}\n```",None)
                 return await ctx.reply(embed=em,view=view)
-        msg = await self.bot.wait_for('message', check=lambda message : message.author == ctx.author and message.channel == ctx.channel, timeout=120)
+        try:
+            msg = await self.bot.wait_for('message', check=lambda message : message.author == ctx.author and message.channel == ctx.channel, timeout=120)
+        except asyncio.TimeoutError:
+            return await ctx.send(embed=embed('Error | Timed out','You did not respond in time. Re run the command and try to respond under 120 seconds.')[0])
         token = msg.content
         WORD = len(token)
         if WORD == 62 and token[1] == "/":
@@ -77,7 +81,7 @@ class Auth(commands.Cog):
     @commands.command(description=f'Used to revoke your Google Drive connected with the bot.\n`{cogs._config.prefix}revoke`')
     async def revoke(self,ctx):
         db.delete_creds(ctx.author.id)
-        em = embed(f"🔓 Revoked current logged in account successfully.","Use `{cogs._config.prefix}auth` to authenticate again and use this bot.",None)[0]
+        em = embed("🔓 Revoked current logged in account successfully.",f"Use `{cogs._config.prefix}auth` to authenticate again and use this bot.",None)[0]
         await ctx.send(embed=em)
 
 def setup(bot):
