@@ -3,3 +3,4 @@ temporary/
 venv/
 log.txt
 .env
+video/

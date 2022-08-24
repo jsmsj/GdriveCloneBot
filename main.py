@@ -60,3 +60,5 @@ if __name__ == '__main__':
 
     logger.info("Bot has started, all cogs are loaded.")
     bot.run(cogs._config.bot_token)
+
+# Commit to check if automerge works or not
