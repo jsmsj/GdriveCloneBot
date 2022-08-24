@@ -11,16 +11,6 @@ from cogs._helpers import is_allowed,embed
 
 from main import logger
 
-OAUTH_SCOPE = "https://www.googleapis.com/auth/drive"
-# REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"
-REDIRECT_URI = "http://localhost:1/"
-flow = OAuth2WebServerFlow(
-                        cogs._config.G_DRIVE_CLIENT_ID,
-                        cogs._config.G_DRIVE_CLIENT_SECRET,
-                        OAUTH_SCOPE,
-                        redirect_uri=REDIRECT_URI
-                )
-
 class Auth(commands.Cog):
     """Auth commands"""
 
@@ -37,9 +27,17 @@ class Auth(commands.Cog):
     @is_allowed()
     @commands.command(aliases=['authorize'],description=f'Used to authorise your Google Drive with the bot.\n`{cogs._config.prefix}auth`')
     async def auth(self,ctx):
+        OAUTH_SCOPE = "https://www.googleapis.com/auth/drive"
+        # REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"
+        REDIRECT_URI = "http://localhost:1/"
+        flow = OAuth2WebServerFlow(
+                                cogs._config.G_DRIVE_CLIENT_ID,
+                                cogs._config.G_DRIVE_CLIENT_SECRET,
+                                OAUTH_SCOPE,
+                                redirect_uri=REDIRECT_URI
+                        )
         user_id = ctx.author.id
         creds = db.find_creds(user_id)
-        global flow
         if creds is not None:
             creds.refresh(Http())
             db.insert_creds(user_id,creds)
