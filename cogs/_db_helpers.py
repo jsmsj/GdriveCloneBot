@@ -97,12 +97,12 @@ def delete_parent_id(user_id):
 
 ############
 def upload_sas():
-    sas_folder_parent = os.getcwd() + "\\sas"
+    sas_folder_parent = os.getcwd() + "/sas"
     dirlist = os.listdir(sas_folder_parent)
-    sas_folder = sas_folder_parent + f"\\{dirlist[0]}"
+    sas_folder = sas_folder_parent + f"/{dirlist[0]}"
     sa_files = os.listdir(sas_folder)
     for idx,filename in enumerate(sa_files):
-        with open(sas_folder+f"\\{filename}") as f:
+        with open(sas_folder+f"/{filename}") as f:
             data = json.load(f)
             data['sa_file_index'] = idx
             sas_db.insert_one(data)
@@ -125,7 +125,7 @@ def create_db_insert_sas(project_id):
     sas_folder = 'accounts'
     sa_files = os.listdir(sas_folder)
     for filename in sa_files:
-        with open(sas_folder+f"\\{filename}") as f:
+        with open(sas_folder+f"/{filename}") as f:
             data = json.load(f)
             temp.insert_one(data)
 

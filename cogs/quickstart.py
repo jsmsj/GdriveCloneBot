@@ -58,7 +58,7 @@ class Quickstart(commands.Cog):
                     f.write(data["client_email"]+"\n")
             await ctx.send(embed=embed("🧾 Service Accounts","Here is the emails file. Add these to a google group and add that google group to a teamdrive, incase you want to copy stuff to teamdrive.")[0],file=discord.File('emails.txt'))
             for idx,filename in enumerate(list_of_acc_fname):
-                with open('accounts'+f"\\{filename}") as f:
+                with open('accounts'+f"/{filename}") as f:
                     data = json.load(f)
                     data['sa_file_index'] = idx
                     db.sas_db.insert_one(data)
