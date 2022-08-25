@@ -30,6 +30,23 @@ class General(commands.Cog):
         else:
             await ctx.send(embed=embed('📃 Log File','No logfile found :(')[0])
 
+    @commands.command(description=f"About Me and instructions on how to deploy the bot.\n`{prefix}info`")
+    async def info(self,ctx):
+        desc = "A discord bot to **clone public/private google drive links** to your personal teamdrive or google drive. Additionally it offers commands to **generate service accounts**, and with proper tutorials.\n\n> IT IS NOT A MIRROR BOT"
+        desc+= "\n\nDeploying Tutorial : [Youtube](https://youtu.be/csH-SaaDN6A)\n"
+        desc+="\nOther Tutorials:\n"
+        desc+="""[quickstart](https://youtu.be/7PvR1MC_khI)
+[auth](https://youtu.be/fUKg5Ge2zl4)
+[authsa](https://youtu.be/rz59wScRrqE)
+[uploadsas](https://youtu.be/ofbelNADAtA)
+[pubclone](https://youtu.be/9dH121W0DZQ)
+[privclone](https://youtu.be/1eM3jXXJJtM)
+[set_folder](https://youtu.be/e1wqjROvc-I)
+[size](https://youtu.be/765uHC6Ybfk)
+[listprojects, createsa, downloadsazip, saemails](https://youtu.be/hWmX-a22uLA)"""
+        em,view = embed('About Me',desc,url="https://www.youtube.com/watch?v=csH-SaaDN6A")
+        await ctx.send(embed=em,view=view)
+
 
 
 def setup(bot):
