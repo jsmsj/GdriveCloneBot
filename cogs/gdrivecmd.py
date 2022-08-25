@@ -53,6 +53,17 @@ class GdriveCmd(commands.Cog):
             em,view = embed(title="❗ Provide a valid Google Drive URL along with commmand.",description=f"```\nUsage -> {cogs._config.prefix}pubclone (GDrive Link)\n```")
             await ctx.reply(embed=em,view=view)
 
+    @pubclone.error
+    async def pubclone_err(self,ctx,error):
+        if isinstance(error,commands.CheckFailure):
+            await ctx.send(f'Error | you have not uploaded service accounts, use `{cogs._config.prefix}uploadsas` to upload service accounts, and then run this command.')
+        else:
+            logger.warning(error)
+            _file=None
+            if os.path.exists('log.txt'):
+                _file = discord.File('log.txt')
+            await ctx.send(embed=embed(f'Error | {ctx.command.name}',f'An error occured, kindly report it to jsmsj#5252.\n```py\n{error}\n```\nHere is the attached logfile.')[0],file=_file)
+
     @is_allowed()
     @has_credentials()
     @commands.command(description=f'Used to set the defaut cloning location.\n`{cogs._config.prefix}set_folder gdrive_link`')
