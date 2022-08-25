@@ -167,3 +167,9 @@ def not_has_sa_creds():
     async def predicate(ctx:commands.Context):
         return False if sascre_find_creds(ctx.author.id) else True
     return commands.check(predicate)
+
+def has_uploaded_sas():
+    async def predicate(ctx):
+        x = sas_db.find_one()
+        return True if x else False
+    return commands.check(predicate)

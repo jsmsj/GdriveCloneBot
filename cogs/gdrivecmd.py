@@ -4,7 +4,7 @@ import os,shutil
 from discord.ext import commands
 from cogs._gd_utils import GoogleDrive
 import cogs._db_helpers as db
-from cogs._db_helpers import has_credentials
+from cogs._db_helpers import has_credentials,has_uploaded_sas
 from cogs._helpers import extract_sas,is_allowed,embed
 from main import logger
 import cogs._config
@@ -39,6 +39,7 @@ class GdriveCmd(commands.Cog):
 
     @is_allowed()
     @has_credentials()
+    @has_uploaded_sas()
     @commands.command(description=f'Used to clone Files/Folders which your Service Accounts can access.\n`{cogs._config.prefix}pubclone gdrive_link`')
     async def pubclone(self,ctx,*,link=None):
         user_id = ctx.author.id
