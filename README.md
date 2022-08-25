@@ -13,6 +13,8 @@ The bot requires your google drive authentication to clone the files to which yo
 
 ### Clone google drive links
 - Continue reading to see which links can the bot clone
+- Shows you the current speed by which it clones as well as the file it is cloning
+- add ETA and size of current file etc, see [TODO](TODO)
 
 ### Service Accounts
 - Features a `quickstart` command for the newbies to quickly generate 100 service accounts.
@@ -46,12 +48,55 @@ The bot requires your google drive authentication to clone the files to which yo
 > 
 > The Bot can clone to Teamdrive (Shared drive) if and only if you or your S.A. have uploading access.
 
+## Images
+
+---
+### Cloning public links:
+---
+![pubclone1](images/pubclone.png)
+
+> Speed shown in brackets is the instantaneous speed of cloning
+
+![pubclone2](images/pubclone2.png)
+---
+### Cloning a private link
+---
+![privclone1](images/privclone.png)
+---
+### Service Account Utilities
+---
+![sa1](images/sa1.png)
+
+---
+![sa2](images/sa2.png)
+
+---
+![sa3](images/sa3.png)
+---
+
+
+
 # How to deploy ?
 
-video coming soon 
-<p><a href="https://www.google.com"> <img src="https://img.shields.io/badge/See%20Video-black?style=for-the-badge&logo=YouTube" width="160""/></a></p>
+## Main video
+<p><a href="https://youtu.be/csH-SaaDN6A"> <img src="https://img.shields.io/badge/See%20Video-black?style=for-the-badge&logo=YouTube" width="160""/></a></p>
 
+> If the video is slow for you, watch in 2x speed.
 
+## Command specific videos:
+- [quickstart](https://youtu.be/7PvR1MC_khI)
+- [auth](https://youtu.be/fUKg5Ge2zl4)
+- [authsa](https://youtu.be/rz59wScRrqE)
+- [uploadsas](https://youtu.be/ofbelNADAtA)
+- [pubclone](https://youtu.be/9dH121W0DZQ)
+- [privclone](https://youtu.be/1eM3jXXJJtM)
+- [set_folder](https://youtu.be/e1wqjROvc-I)
+- [size](https://youtu.be/765uHC6Ybfk)
+- [listprojects, createsa, downloadsazip, saemails](https://youtu.be/hWmX-a22uLA)
+
+---
+
+# DM open for recommendations > Discord: jsmsj#5252
 
 
 

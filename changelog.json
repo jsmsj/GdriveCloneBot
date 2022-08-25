@@ -63,5 +63,35 @@
         "title":"add upstream merge + others",
         "description":"Added a workflow to automatically merge upstream and fixed authorization method. and a few missing f strings",
         "timestamp":1661275153
+    },
+    "14":{
+        "title":"fix \\\\ to /",
+        "description":"Fix an issue which was causing heroku to not send service accounts",
+        "timestamp":1661338440
+    },
+    "15":{
+        "title":"move flow into auth.py",
+        "description":"Fix initialisation of webserverflow",
+        "timestamp":1661355840
+    },
+    "16":{
+        "title":"check automerge",
+        "description":"check the automerge feature if its working",
+        "timestamp":1661362860
+    },
+    "17":{
+        "title":"fix (cloning without sas)",
+        "description":"Prevents error when cloning public links without service accounts",
+        "timestamp":1661421420
+    },
+    "18":{
+        "title":"add images, pubclone err",
+        "description":"Add images to the repo, and add error handler for pubclone command",
+        "timestamp":1661429640
+    },
+    "19":{
+        "title":"Update readme.md",
+        "description":"Added video tutorials for deploying as well as commands.",
+        "timestamp":1661433780
     }
 }
