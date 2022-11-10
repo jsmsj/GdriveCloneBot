@@ -39,6 +39,12 @@ def humanbytes(size: int) -> str:
         number += 1
     return str(round(size, 3)) + " " + dict_power_n[number] + 'B'
 
+def humantime(seconds):
+    if seconds > 3600:
+        return time.strftime("%Hh%Mm%Ss", time.gmtime(seconds))
+    else:
+        return time.strftime("%Mm%Ss", time.gmtime(seconds))
+
 def extract_sas(filename):
     with zipfile.ZipFile(filename,'r') as myzip:
         myzip.extractall('sas')
@@ -64,7 +70,8 @@ def show_progress_still(current:int,total:int,width:int):
 def status_emb(transferred:int,current_file_name,total_size:int,start_time):
     em = discord.Embed(title="📺 Status : Copying...",color=discord.Color.green(),url="https://github.com/jsmsj/gdriveclonebot")
     em.set_footer(text="Made with 💖 by jsmsj")
-    em.description = f"Current File: `{current_file_name}`\nStatus: Copying...📚\nCopied: {humanbytes(transferred)} of {humanbytes(total_size)} (`{humanbytes(int(transferred/(time.time()-start_time)))}/s`)\n\n{show_progress_still(transferred,total_size,20)}🏁 {round(transferred*100/total_size,3)} %"
+    speed = int(transferred/(time.time()-start_time))
+    em.description = f"Current File: `{current_file_name}`\nStatus: Copying...📚\nCopied: {humanbytes(transferred)} of {humanbytes(total_size)} (`{humanbytes(speed)}/s`) (ETA: `{humantime((total_size-transferred)/speed)}` )\n\n{show_progress_still(transferred,total_size,20)}🏁 {round(transferred*100/total_size,3)} %"
     return em
 
 def zip_sas_cre():

@@ -79,7 +79,7 @@ The bot requires your google drive authentication to clone the files to which yo
 # How to deploy ?
 
 ## Main video
-<p><a href="https://youtu.be/csH-SaaDN6A"> <img src="https://img.shields.io/badge/See%20Video-black?style=for-the-badge&logo=YouTube" width="160""/></a></p>
+<p><a href="https://www.youtube.com/watch?v=MfnP1M0BW7Y"> <img src="https://img.shields.io/badge/See%20Video-black?style=for-the-badge&logo=YouTube" width="160""/></a></p>
 
 > If the video is slow for you, watch in 2x speed.
 

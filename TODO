@@ -4,9 +4,9 @@ bypasser
 search for files (with sorting options)
 webapp for this thing
 add option to create projects
-add ETA
 show size of current file being cloned.
 files_cloned/files_left
+if pubclone not work, do you want to privclone
 
 DONE:
 size cmd
@@ -16,3 +16,4 @@ heroku stuff
 lst_changelog
 errors :(
 add checkfail
+add ETA
