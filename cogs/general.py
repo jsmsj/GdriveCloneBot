@@ -33,7 +33,7 @@ class General(commands.Cog):
     @commands.command(description=f"About Me and instructions on how to deploy the bot.\n`{prefix}info`")
     async def info(self,ctx):
         desc = "A discord bot to **clone public/private google drive links** to your personal teamdrive or google drive. Additionally it offers commands to **generate service accounts**, and with proper tutorials.\n\n> IT IS NOT A MIRROR BOT"
-        desc+= "\n\nDeploying Tutorial : [Youtube](https://youtu.be/csH-SaaDN6A)\n"
+        desc+= "\n\nDeploying Tutorial : [Youtube](https://www.youtube.com/watch?v=MfnP1M0BW7Y)\n"
         desc+="\nOther Tutorials:\n"
         desc+="""[quickstart](https://youtu.be/7PvR1MC_khI)
 [auth](https://youtu.be/fUKg5Ge2zl4)

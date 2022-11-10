@@ -99,5 +99,29 @@
         "description":"Added info command which tells about the bot and gives deploying tutorial.",
         "timestamp":1661434206
 
+    },
+    "21":{
+        "title":"add ETA, update ytlink",
+        "description":"Bot now shows ETA for completion and updated youtube link for hosting.",
+        "timestamp":1668090262
+
+    },
+    "22":{
+        "title":"add files done/files left",
+        "description":"Bot now shows Transferred files out of total files.",
+        "timestamp":1668093682
+
+    },
+    "23":{
+        "title":"update requirements to support py 3.11",
+        "description":"Now bot will work with python 3.11",
+        "timestamp":1668094162
+
+    },
+    "24":{
+        "title":"Add local hosting guide",
+        "description":"Added guide for hosting the bot locally.",
+        "timestamp":1668099982
+
     }
 }
