@@ -67,11 +67,11 @@ def show_progress_still(current:int,total:int,width:int):
         hashblocks = 0
     return "#️⃣"* hashblocks + "▶️" + "🟦"*(width-hashblocks-1)
 
-def status_emb(transferred:int,current_file_name,total_size:int,start_time):
+def status_emb(transferred:int,current_file_name,current_file_size,total_size:int,start_time,total_files,num_of_files_transferred):
     em = discord.Embed(title="📺 Status : Copying...",color=discord.Color.green(),url="https://github.com/jsmsj/gdriveclonebot")
     em.set_footer(text="Made with 💖 by jsmsj")
     speed = int(transferred/(time.time()-start_time))
-    em.description = f"Current File: `{current_file_name}`\nStatus: Copying...📚\nCopied: {humanbytes(transferred)} of {humanbytes(total_size)} (`{humanbytes(speed)}/s`) (ETA: `{humantime((total_size-transferred)/speed)}` )\n\n{show_progress_still(transferred,total_size,20)}🏁 {round(transferred*100/total_size,3)} %"
+    em.description = f"Current File: `{current_file_name}`\nCurrent File Size: `{humanbytes(current_file_size)}`\nStatus: Copying...📚\nTransferred {num_of_files_transferred} of {total_files}\nCopied: {humanbytes(transferred)} of {humanbytes(total_size)} (`{humanbytes(speed)}/s`) (ETA: `{humantime((total_size-transferred)/speed)}` )\n\n{show_progress_still(transferred,total_size,20)}🏁 {round(transferred*100/total_size,3)} %"
     return em
 
 def zip_sas_cre():

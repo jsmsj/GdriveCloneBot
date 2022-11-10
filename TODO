@@ -4,9 +4,6 @@ bypasser
 search for files (with sorting options)
 webapp for this thing
 add option to create projects
-show size of current file being cloned.
-files_cloned/files_left
-if pubclone not work, do you want to privclone
 
 DONE:
 size cmd
@@ -17,3 +14,6 @@ lst_changelog
 errors :(
 add checkfail
 add ETA
+show size of current file being cloned.
+if pubclone not work, do you want to privclone
+files_cloned/files_left

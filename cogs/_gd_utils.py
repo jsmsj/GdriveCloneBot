@@ -93,7 +93,7 @@ class GoogleDrive:
             else:
                 logger.error(err,exc_info=True)
 
-    async def cloneFolder(self, name, local_path, folder_id, parent_id,msg:Message,total_size:int):
+    async def cloneFolder(self, name, local_path, folder_id, parent_id,msg:Message,total_size:int,total_files):
         files = self.getFilesByFolderId(folder_id)
         new_id = None
         if len(files) == 0:
@@ -102,15 +102,16 @@ class GoogleDrive:
             if file.get('mimeType') == self.__G_DRIVE_DIR_MIME_TYPE:
                     file_path = os.path.join(local_path, file.get('name'))
                     current_dir_id = self.create_directory(file.get('name'),parent_id=parent_id)
-                    new_id = await self.cloneFolder(file.get('name'), file_path, file.get('id'), current_dir_id,msg,total_size)
+                    new_id = await self.cloneFolder(file.get('name'), file_path, file.get('id'), current_dir_id,msg,total_size,total_files)
             else:
                 try:
                     self.transferred_size += int(file.get('size'))
+                    self.num_of_files_transferred +=1
                 except TypeError:
                     pass
                 try:
                     self.copyFile(file.get('id'), parent_id)
-                    emb = status_emb(transferred = self.transferred_size,current_file_name = file.get('name'),total_size=total_size,start_time=self.start_time)
+                    emb = status_emb(transferred = self.transferred_size,current_file_name = file.get('name'),current_file_size=int(file.get('size')) ,total_size=total_size,start_time=self.start_time,total_files=total_files,num_of_files_transferred=self.num_of_files_transferred)
                     await msg.edit(embed=emb)
                     new_id = parent_id
                 except Exception as err:
@@ -137,6 +138,7 @@ class GoogleDrive:
 
     async def clone(self,msg:Message,link):
         self.transferred_size = 0
+        self.num_of_files_transferred = 0
         self.start_time = time.time()
         try:
             file_id = self.getIdFromUrl(link)
@@ -144,20 +146,23 @@ class GoogleDrive:
             return embed(title="❗ Invalid Google Drive URL",description="Make sure the Google Drive URL is in valid format.")
         try:
             self.size_service = TotalSize(file_id,self.__service)
-            total_size = self.size_service.calc_size()
+            total_size,total_files = self.size_service.calc_size_and_files()
             meta = self.__service.files().get(supportsAllDrives=True, fileId=file_id, fields="name,id,mimeType,size").execute()
             if meta.get("mimeType") == self.__G_DRIVE_DIR_MIME_TYPE:
                 dir_id = self.create_directory(meta.get('name'),parent_id=self.__parent_id)
-                result = await self.cloneFolder(meta.get('name'), meta.get('name'), meta.get('id'), dir_id,msg,total_size)
-                return embed(title="✅ Copied successfully.",description=f"[{meta.get('name')}]({self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id)}) ---- `{humanbytes(self.transferred_size)}`\n{'#️⃣'*19+'▶️'} 100 % (`{humanbytes(int(self.transferred_size/(time.time()-self.start_time)))}/s`)",url=self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id))
+                result = await self.cloneFolder(meta.get('name'), meta.get('name'), meta.get('id'), dir_id,msg,total_size,total_files)
+                return embed(title="✅ Copied successfully.",description=f"[{meta.get('name')}]({self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id)}) ---- `{humanbytes(self.transferred_size)}`\nTransferred {self.num_of_files_transferred} of {total_files}\n\n{'#️⃣'*19+'▶️'} 100 % (`{humanbytes(int(self.transferred_size/(time.time()-self.start_time)))}/s`)",url=self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id))
             else:
                 file = self.copyFile(meta.get('id'), self.__parent_id)
-                return embed(title="✅ Copied successfully.",description=f"[{file.get('name')}]({self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id'))}) ---- `{humanbytes(int(meta.get('size')))}`\n{'#️⃣'*19+'▶️'} 100 % (`{humanbytes(int(int(meta.get('size'))/(time.time()-self.start_time)))}/s`)",url=self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id')))
+                self.num_of_files_transferred+=1
+                return embed(title="✅ Copied successfully.",description=f"[{file.get('name')}]({self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id'))}) ---- `{humanbytes(int(meta.get('size')))}`\nTransferred {self.num_of_files_transferred} of {total_files}\n\n{'#️⃣'*19+'▶️'} 100 % (`{humanbytes(int(int(meta.get('size'))/(time.time()-self.start_time)))}/s`)",url=self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id')))
         except Exception as err:
             if isinstance(err, RetryError):
                 err = err.last_attempt.exception()
             err = str(err).replace('>', '').replace('<', '')
-            return embed(title="Error",description=f"```\n{err}\n```")
+            further_messages = ["If you were trying to clone a private link, try `privclone` command.","I don't think you have access to this folder/file."]
+            further_message = further_messages[0] if self.use_sa else further_messages[1]
+            return embed(title="Error",description=f"```\n{err}\n```\n{further_message}")
 
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(5),
@@ -249,15 +254,16 @@ class TotalSize:
         self.__G_DRIVE_DIR_MIME_TYPE = "application/vnd.google-apps.folder"
         self.__service = service
         self.total_bytes = 0
+        self.total_files = 0
 
-    def calc_size(self):
+    def calc_size_and_files(self):
         drive_file = self.__service.files().get(fileId=self.link_id, fields="id, mimeType, size",
                                                 supportsTeamDrives=True).execute()
         if drive_file['mimeType'] == self.__G_DRIVE_DIR_MIME_TYPE:
             self.gDrive_directory(**drive_file)
         else:
             self.gDrive_file(**drive_file)
-        return self.total_bytes
+        return self.total_bytes,self.total_files
 
     def list_drive_dir(self, file_id: str) -> list:
         query = f"'{file_id}' in parents and (name contains '*')"
@@ -281,6 +287,7 @@ class TotalSize:
     def gDrive_file(self, **kwargs):
         try:
             size = int(kwargs['size'])
+            self.total_files+=1
         except:
             size = 0
         self.total_bytes += size
