@@ -9,6 +9,22 @@ This is a clone bot, which clones google drive urls, to your own Teamdrive or Pe
 
 The bot requires your google drive authentication to clone the files to which you have access. It also clones public google drive links, moreover you can add your service accounts, to increase the limit of cloning public urls
 
+
+# How to deploy ?
+
+## Main video [Includes heroku deployment]
+<p><a href="https://www.youtube.com/watch?v=MfnP1M0BW7Y"> <img src="https://img.shields.io/badge/See%20Video-black?style=for-the-badge&logo=YouTube" width="160""/></a></p>
+
+> If the video is slow for you, watch in 2x speed.
+
+## Host locally
+[Read Guide](docs/Host%20Locally.md)
+
+## Host on railway.app
+[Read Guide](docs/Host%20on%20Railway)
+
+
+
 ## Features:
 
 ### Clone google drive links
@@ -74,14 +90,6 @@ The bot requires your google drive authentication to clone the files to which yo
 ![sa3](images/sa3.png)
 ---
 
-
-
-# How to deploy ?
-
-## Main video
-<p><a href="https://www.youtube.com/watch?v=MfnP1M0BW7Y"> <img src="https://img.shields.io/badge/See%20Video-black?style=for-the-badge&logo=YouTube" width="160""/></a></p>
-
-> If the video is slow for you, watch in 2x speed.
 
 ## Command specific videos:
 - [quickstart](https://youtu.be/7PvR1MC_khI)
