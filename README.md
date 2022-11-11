@@ -21,7 +21,7 @@ The bot requires your google drive authentication to clone the files to which yo
 [Read Guide](docs/Host%20Locally.md)
 
 ## Host on railway.app
-[Read Guide](docs/Host%20on%20Railway)
+[Read Guide](docs/Host%20on%20Railway.md)
 
 
 
