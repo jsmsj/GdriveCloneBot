@@ -224,7 +224,7 @@ class GoogleDrive:
             logger.error(err,exc_info=True)
             return embed(title="❗ Invalid Google Drive URL",description="Make sure the Google Drive URL is in valid format.")
         size_serve = TotalSize(file_id,self.__service)
-        total_size = size_serve.calc_size()
+        total_size = size_serve.calc_size_and_files()[0]
         return embed('💾 Size',f'`{total_size} bytes`\nor\n`{humanbytes(total_size)}`')
 
     def switchSaIndex(self):
