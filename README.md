@@ -23,7 +23,7 @@ The bot requires your google drive authentication to clone the files to which yo
 ## Host on railway.app
 [Read Guide](docs/Host%20on%20Railway.md)
 
-
+## Don't forget to ⭐ and fork :)
 
 ## Features:
 
@@ -104,7 +104,7 @@ The bot requires your google drive authentication to clone the files to which yo
 
 ---
 
-# DM open for recommendations > Discord: jsmsj#5252
+# DM open for recommendations/issues > Discord: jsmsj#5252
 
 
 
