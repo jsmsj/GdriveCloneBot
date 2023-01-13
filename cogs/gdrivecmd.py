@@ -8,6 +8,7 @@ from cogs._db_helpers import has_credentials,has_uploaded_sas
 from cogs._helpers import extract_sas,is_allowed,embed
 from main import logger
 import cogs._config
+import asyncio
 
 class GdriveCmd(commands.Cog):
     """GdriveCmd commands"""
@@ -145,6 +146,32 @@ class GdriveCmd(commands.Cog):
         emb = gdrive.size(url)[0]
         await msg.edit(embed=emb)
 
+
+    # WORK IN PROGRESS FOR THREADING
+
+    # @is_allowed()
+    # @has_credentials()
+    # @has_uploaded_sas()
+    # @commands.command(description=f'Used to clone Files/Folders which your Service Accounts can access.\n`{cogs._config.prefix}pubclone gdrive_link`')
+    # async def thpubclone(self,ctx,*,link=None):
+    #     user_id = ctx.author.id
+    #     if link:
+    #         em,view = embed(title="🗂️ Cloning into Google Drive...",description="Please wait till this clone completes, and then only send the next link.",url=link)
+    #         sent_message:discord.Message = await ctx.reply(embed=em,view=view)
+    #         user_gd_cls = GoogleDrive(user_id,use_sa=True)
+    #         number_of_threads = 4
+    #         messages = [sent_message]
+    #         for i in range(number_of_threads):
+    #             msg = await ctx.send(f"Starting Thread {i+1}. Please Wait")
+    #             messages.append(msg)
+    #         loop = asyncio.get_running_loop()
+    #         emb,vieww = await user_gd_cls.threaded_clone(messages,link,number_of_threads,loop)
+    #         await sent_message.edit(embed=emb,view=vieww)
+    #         for msg in messages[1:]:
+    #             await msg.delete(delay=0.5)
+    #     else:
+    #         em,view = embed(title="❗ Provide a valid Google Drive URL along with commmand.",description=f"```\nUsage -> {cogs._config.prefix}pubclone (GDrive Link)\n```")
+    #         await ctx.reply(embed=em,view=view)
 
 def setup(bot):
     bot.add_cog(GdriveCmd(bot))

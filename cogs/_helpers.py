@@ -6,7 +6,7 @@ import zipfile
 import shutil
 import os
 import time
-
+from math import ceil
 
 def is_allowed():
     async def predicate(ctx:commands.Context):
@@ -78,3 +78,17 @@ def zip_sas_cre():
     if os.path.exists('accounts'):
         shutil.make_archive("aaccounts", 'zip', "accounts")
         
+
+def list_into_n_parts(lst, n):
+  size = ceil(len(lst) / n)
+  return list(
+    map(lambda x: lst[x * size:x * size + size],
+    list(range(n)))
+  )
+
+def threaded_status_emb(transferred:int,current_file_name,current_file_size,total_size:int,start_time):
+    em = discord.Embed(title="📺 Status : Copying...",color=discord.Color.green(),url="https://github.com/jsmsj/gdriveclonebot")
+    em.set_footer(text="Made with 💖 by jsmsj")
+    speed = int(transferred/(time.time()-start_time))
+    em.description = f"Current File: `{current_file_name}`\nCurrent File Size: `{humanbytes(current_file_size)}`\nStatus: Copying...📚\nCopied: {humanbytes(transferred)} of {humanbytes(total_size)} (`{humanbytes(speed)}/s`) (ETA: `{humantime((total_size-transferred)/speed)}` )\n\n{show_progress_still(transferred,total_size,20)}🏁 {round(transferred*100/total_size,3)} %"
+    return em
