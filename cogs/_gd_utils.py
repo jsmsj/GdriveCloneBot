@@ -91,7 +91,7 @@ class GoogleDrive:
                 if reason == 'userRateLimitExceeded' or reason == 'dailyLimitExceeded':
                     if self.use_sa:
                         self.switchSaIndex()
-                        self.copyFile(file_id, dest_id)
+                        return self.copyFile(file_id, dest_id)
                     else:
                         logger.debug(reason)
                         raise IndexError(reason)
