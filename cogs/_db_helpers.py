@@ -98,14 +98,18 @@ def delete_parent_id(user_id):
 ############
 def upload_sas():
     sas_folder_parent = os.getcwd() + "/sas"
-    dirlist = os.listdir(sas_folder_parent)
-    sas_folder = sas_folder_parent + f"/{dirlist[0]}"
-    sa_files = os.listdir(sas_folder)
-    for idx,filename in enumerate(sa_files):
-        with open(sas_folder+f"/{filename}") as f:
-            data = json.load(f)
-            data['sa_file_index'] = idx
-            sas_db.insert_one(data)
+    with os.scandir(sas_folder_parent) as parent_dir:
+        for entry in parent_dir:
+            if entry.is_dir() and not entry.name.startswith('.'):
+                sas_folder = entry.path
+                with os.scandir(sas_folder) as sa_dir:
+                    for idx, file in enumerate(sa_dir):
+                        if file.name.endswith('.json'):
+                            with open(file.path) as f:
+                                data = json.load(f)
+                                data['sa_file_index'] = idx
+                                sas_db.insert_one(data)
+            
 
 def find_sas():
     sas_all = list(sas_db.find())
